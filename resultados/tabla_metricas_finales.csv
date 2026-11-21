@@ -1,0 +1,6 @@
+config,cobertura_recuperada,cobertura_en_contexto,correccion,respaldo_citas,abstencion_apropiada,tiempo_promedio_seg
+R0,4/6,4/6,4/6,5/6 (83.3%),3/3,4.12
+R1,2/6,2/6,2/6,6/6 (100%),3/3,3.78
+R2,4/6,4/6,4/6,6/6 (100%),3/3,3.93
+C0,0/6 (N/A),0/6 (N/A),0/6,No aplica,2/3,4.91
+R0_ALT,2/6,2/6,1/6,5/6 (83.3%),3/3,3.35

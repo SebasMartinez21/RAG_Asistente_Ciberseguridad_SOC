@@ -1,0 +1,186 @@
+﻿config,id_pregunta,tipo,tiempo_seg,contexto_recortado,cobertura_recuperada,cobertura_en_contexto,abstencion_preliminar,respuesta_modelo,respuesta_esperada
+R0,Q1,directa,9.1,False,False,False,,"La longitud mínima de contraseña para cuentas administrativas es de 16 caracteres [Politica_Seguridad_y_Accesos.pdf | Página 2 [Parte 1]]. No encuentro evidencia suficiente en los documentos del corpus para responder sobre los métodos MFA permitidos. Tras intentos fallidos, la cuenta se bloquea automáticamente durante 15 minutos [Politica_Seguridad_y_Accesos.pdf | Página 2 [Parte 3]].",Longitud mínima de 16 caracteres para cuentas administrativas; MFA permitido únicamente con llaves físicas FIDO2/WebAuthn o apps TOTP (prohibido SMS/llamadas); bloqueo automático de 15 minutos tras 5 intentos fallidos.
+R0,Q2,directa,2.64,False,True,True,,"El servicio SSH en los servidores Linux debe escuchar en el puerto 2222, ya que se prohíbe exponer el puerto estándar 22 [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Parte 2]].
+
+El inicio de sesión directo como root debe estar deshabilitado mediante la configuración `PermitRootLogin no` [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Parte 2]].
+
+Solo se permite autenticación por llave pública usando los algoritmos Ed25519 o RSA de 4096 bits, y se debe deshabilitar la autenticación por contraseña (`PasswordAuthentication no`) [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Parte 2]].",El servicio SSH debe escuchar en el puerto 2222 (prohibido el 22); se deshabilita el acceso directo de root (PermitRootLogin no) y contraseñas; solo se permiten llaves Ed25519 o RSA de 4096 bits.
+R0,Q3,directa,5.66,False,True,True,,"El playbook PB-03 indica los siguientes pasos obligatorios para un ataque de fuerza bruta SSH o VPN:
+
+1. **Evaluación de umbral:** Verificar si una misma IP externa supera **20 intentos fallidos en un lapso de 5 minutos** contra servicios SSH o VPN [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 51-55) [Parte 1]].
+
+2. **Verificación de éxito:** Comprobar en los logs si existió algún inicio de sesión exitoso posterior desde la IP atacante o desde la misma subred [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 51-55) [Parte 1]].
+
+3. **Bloqueo:** Si no hubo compromiso, bloquear la IP atacante en el firewall perimetral durante **24 horas** y registrar el evento como severidad **P3** [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 51-55) [Parte 2]].
+
+4. **Escalamiento por compromiso:** Si se detecta un inicio de sesión exitoso tras los intentos fallidos, escalar a **P2** (o **P1** si es cuenta privilegiada), revocar llaves SSH o certificados VPN afectados y revisar persistencia en el servidor [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 51-55) [Parte 2]].","Verificar si una misma IP supera 20 intentos fallidos en 5 minutos; comprobar si hubo inicio de sesión exitoso posterior; si no hubo éxito, bloquear la IP en firewall perimetral por 24 horas (P3); si hubo éxito, escalar a P2/P1 y revocar llaves o certificados."
+R0,Q4,combinada,3.36,False,True,True,,"Según el contexto proporcionado:
+
+1. **No se debe apagar el equipo** para preservar la memoria RAM, lo que permite el análisis forense posterior. Esto se evidencia en un incidente previo donde se aisló el equipo sin apagarlo: ""[El analista de guardia aisló el equipo de la red vía EDR en 12 minutos sin apagarlo, preservando la memoria RAM]"" [Registro_Incidentes_Resueltos.md | Sección 'INC-2026-023' (Líneas 27-36)].
+
+2. **Tiempos máximos de respuesta**:
+   - **Primera respuesta**: 15 minutos desde la detección [Matriz_SLA_y_Escalamiento.docx | Tabla 1].
+   - **Contención máxima**: 1 hora para limitar el alcance del incidente [Matriz_SLA_y_Escalamiento.docx | Tabla 1].
+   - **Notificación al CISO**: Debe ser inmediata, ya que todo ransomware activo se clasifica como P1 (Crítico) [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 38-46)].
+
+3. **Frecuencia de reporte**: Cada 30 minutos una vez iniciado el incidente [Matriz_SLA_y_Escalamiento.docx | Tabla 1].","Según PB-02 no se debe apagar para preservar la memoria volátil (RAM) y posibles llaves de cifrado; todo ransomware activo es P1 (Crítico), por lo que según la matriz SLA exige primera respuesta en 15 minutos, contención en 1 hora y notificación inmediata al CISO."
+R0,Q5,combinada,4.86,False,False,False,,"En el incidente INC-2026-019 contra el bastión SSH, la configuración de hardening que impidió la intrusión fue la deshabilitación de autenticación por contraseña, permitiendo solo autenticación por llave pública con algoritmos Ed25519 o RSA de 4096 bits, lo que evitó que los intentos de fuerza bruta tuvieran éxito [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Parte 2]].
+
+Además, la guía técnica restringe el acceso al puerto 2222 (SSH) únicamente a la subred de Administración/Bastión, según se detalla en la tabla de puertos permitidos [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Parte 4]].","En INC-2026-019 se confirmó PasswordAuthentication no, PermitRootLogin no y llaves Ed25519; según la guía de hardening, el puerto 2222 está restringido únicamente al origen VPN Corporativa."
+R0,Q6,combinada,3.5,False,True,True,,"Según el playbook, si un ataque de phishing compromete una cuenta con acceso a datos clasificados como ""Restringido"", el incidente debe reclasificarse automáticamente a severidad **P1** [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 25-33) [Parte 3]]. 
+
+Además, en tal caso, el SOC debe notificar al Oficial de Protección de Datos (DPO) en un plazo máximo de **2 horas** desde la confirmación del incidente [Matriz_SLA_y_Escalamiento.docx | Sección '2. Rutas de Escalamiento y Notificación Legal' (Párrafo 9)].","Según PB-01 paso 5, se reclasifica automáticamente a severidad P1; según la Matriz de SLA, si hay posible exposición de datos Restringido debe notificarse al DPO en un plazo máximo de 2 horas desde la confirmación."
+R0,Q7,sin_respuesta,1.15,False,,,True,No encuentro evidencia suficiente en los documentos del corpus para responder esta pregunta.,"Abstención: el corpus menciona genéricamente 'el EDR' y 'firewall perimetral', pero nunca especifica proveedores ni marcas comerciales."
+R0,Q8,sin_respuesta,1.9,False,,,True,No encuentro evidencia suficiente en los documentos del corpus para responder esta pregunta.,"Abstención: los documentos no contienen información financiera, presupuestal ni de dotación de turnos del personal."
+R0,Q9,sin_respuesta,4.95,False,,,True,No encuentro evidencia suficiente en los documentos del corpus para responder esta pregunta.,Abstención: el corpus no incluye protocolos de pérdida o robo de teléfonos móviles ni políticas para viajes internacionales.
+R1,Q1,directa,2.32,False,True,True,,"La longitud mínima de contraseña para cuentas administrativas es de 16 caracteres [Politica_Seguridad_y_Accesos.pdf | Página 2 [Bloque 1]]. 
+
+Los métodos MFA permitidos son únicamente llaves de seguridad físicas FIDO2/WebAuthn o aplicaciones generadoras de códigos TOTP [Politica_Seguridad_y_Accesos.pdf | Página 2 [Bloque 1]].
+
+Tras 5 intentos fallidos consecutivos, la cuenta se bloquea automáticamente durante 15 minutos [Politica_Seguridad_y_Accesos.pdf | Página 2 [Bloque 2]].",Longitud mínima de 16 caracteres para cuentas administrativas; MFA permitido únicamente con llaves físicas FIDO2/WebAuthn o apps TOTP (prohibido SMS/llamadas); bloqueo automático de 15 minutos tras 5 intentos fallidos.
+R1,Q2,directa,1.61,False,False,False,,"Según los documentos del corpus:
+
+1. El servicio SSH en servidores Linux debe escuchar en el puerto 2222, no en el puerto estándar 22 [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Bloque 1]].
+
+No encuentro evidencia suficiente en los documentos del corpus para responder sobre la configuración del usuario root o los algoritmos de llave pública permitidos en SSH.",El servicio SSH debe escuchar en el puerto 2222 (prohibido el 22); se deshabilita el acceso directo de root (PermitRootLogin no) y contraseñas; solo se permiten llaves Ed25519 o RSA de 4096 bits.
+R1,Q3,directa,5.67,False,True,True,,"El playbook PB-03 para ataques de fuerza bruta SSH o VPN establece los siguientes pasos obligatorios:
+
+1. **Evaluación de umbral:** Verificar si una misma IP externa supera **20 intentos fallidos en un lapso de 5 minutos** contra servicios SSH o VPN [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 51-55) [Bloque 1]].
+
+2. **Verificación de éxito:** Comprobar en los logs si existió algún inicio de sesión exitoso posterior desde la IP atacante o desde la misma subred [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 51-55) [Bloque 1]].
+
+3. **Bloqueo:** Si no hubo compromiso, bloquear la IP atacante en el firewall perimetral durante **24 horas** y registrar el evento como severidad **P3** [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 51-55) [Bloque 1]].
+
+4. **Escalamiento por compromiso:** Si se detecta un inicio de sesión exitoso tras los intentos fallidos, escalar a **P2** (o **P1** si es cuenta privilegiada), revocar llaves SSH o certificados VPN afectados y revisar persistencia en el servidor [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 51-55) [Bloque 2]].","Verificar si una misma IP supera 20 intentos fallidos en 5 minutos; comprobar si hubo inicio de sesión exitoso posterior; si no hubo éxito, bloquear la IP en firewall perimetral por 24 horas (P3); si hubo éxito, escalar a P2/P1 y revocar llaves o certificados."
+R1,Q4,combinada,5.66,False,False,False,,"Según el playbook, no se debe apagar el equipo ante una sospecha de ransomware para preservar evidencia volátil y permitir el análisis forense, como se demostró en un incidente previo donde mantener el aislamiento sin apagar el equipo permitió confirmar la causa raíz rápidamente [Registro_Incidentes_Resueltos.md | Sección 'INC-2026-023 — Comportamiento anómalo de cifrado masivo en estación de desarrollo' (Líneas 27-36) [Bloque 2]].
+
+Los tiempos máximos para atender el incidente son:  
+- **Primera respuesta**: 15 minutos (para incidentes P1 como ransomware activo) [Matriz_SLA_y_Escalamiento.docx | Tabla 1 [Bloque 1]].  
+- **Contención máxima**: 1 hora (aplicando medidas como aislamiento de red o bloqueo de IPs sin destruir evidencia) [Matriz_SLA_y_Escalamiento.docx | Tabla 1 [Bloque 1]] y [Playbook_Respuesta_Incidentes.md | Sección '1. Fases Generales del Manejo de Incidentes' (Líneas 9-20) [Bloque 2]].  
+- **Notificación al CISO**: Debe realizarse durante la fase de contención, aunque el tiempo exacto no se especifica en los fragmentos provistos.  
+
+No encuentro evidencia suficiente en los documentos del corpus para confirmar el tiempo máximo específico de notificación al CISO.","Según PB-02 no se debe apagar para preservar la memoria volátil (RAM) y posibles llaves de cifrado; todo ransomware activo es P1 (Crítico), por lo que según la matriz SLA exige primera respuesta en 15 minutos, contención en 1 hora y notificación inmediata al CISO."
+R1,Q5,combinada,5.72,False,False,False,,"En el incidente INC-2026-019, la configuración de hardening que impidió la intrusión fue el uso del puerto no estándar `2222` para SSH en lugar del puerto estándar `22`, como se especifica en la guía técnica de hardening [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Bloque 1]]. 
+
+Además, la guía técnica restringe el acceso al puerto `2222` únicamente a la VPN corporativa, requiriendo un certificado VPN vigente [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Bloque 4]]. 
+
+El incidente registró 142 intentos fallidos desde la IP `185.220.101.45`, pero no hubo accesos exitosos debido a estas medidas [Registro_Incidentes_Resueltos.md | Sección 'INC-2026-019 — Ataque de fuerza bruta contra bastión SSH' (Líneas 17-26) [Bloque 1]].","En INC-2026-019 se confirmó PasswordAuthentication no, PermitRootLogin no y llaves Ed25519; según la guía de hardening, el puerto 2222 está restringido únicamente al origen VPN Corporativa."
+R1,Q6,combinada,5.21,False,False,False,,"Si un ataque de phishing compromete una cuenta con acceso a datos clasificados como Restringido, el incidente debe reclasificarse automáticamente a severidad **P1 (Crítico)** según el playbook [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 25-33) [Bloque 3]]. 
+
+Además, según la matriz de SLA, para incidentes P1 el plazo máximo para la primera respuesta es de **15 minutos** [Matriz_SLA_y_Escalamiento.docx | Tabla 1 [Bloque 1]]. Sin embargo, el contexto no especifica el plazo exacto para notificar al DPO (Data Protection Officer), por lo que no puedo confirmar ese detalle. 
+
+No encuentro evidencia suficiente en los documentos del corpus para responder completamente sobre el plazo de notificación al DPO.","Según PB-01 paso 5, se reclasifica automáticamente a severidad P1; según la Matriz de SLA, si hay posible exposición de datos Restringido debe notificarse al DPO en un plazo máximo de 2 horas desde la confirmación."
+R1,Q7,sin_respuesta,1.08,False,,,True,No encuentro evidencia suficiente en los documentos del corpus para responder esta pregunta.,"Abstención: el corpus menciona genéricamente 'el EDR' y 'firewall perimetral', pero nunca especifica proveedores ni marcas comerciales."
+R1,Q8,sin_respuesta,2.11,False,,,True,No encuentro evidencia suficiente en los documentos del corpus para responder esta pregunta.,"Abstención: los documentos no contienen información financiera, presupuestal ni de dotación de turnos del personal."
+R1,Q9,sin_respuesta,4.64,False,,,True,No encuentro evidencia suficiente en los documentos del corpus para responder esta pregunta.,Abstención: el corpus no incluye protocolos de pérdida o robo de teléfonos móviles ni políticas para viajes internacionales.
+R2,Q1,directa,3.67,False,True,True,,"La longitud mínima de contraseña para cuentas administrativas es de **16 caracteres** [Politica_Seguridad_y_Accesos.pdf | Página 2 [Parte 1]].  
+Los métodos MFA permitidos son **únicamente llaves de seguridad físicas FIDO2/WebAuthn o aplicaciones generadoras de códigos TOTP**, quedando prohibido el uso de SMS o llamadas telefónicas [Politica_Seguridad_y_Accesos.pdf | Página 2 [Parte 2]].  
+Tras **5 intentos fallidos consecutivos**, la cuenta se bloquea automáticamente durante **15 minutos** [Politica_Seguridad_y_Accesos.pdf | Página 2 [Parte 3]].",Longitud mínima de 16 caracteres para cuentas administrativas; MFA permitido únicamente con llaves físicas FIDO2/WebAuthn o apps TOTP (prohibido SMS/llamadas); bloqueo automático de 15 minutos tras 5 intentos fallidos.
+R2,Q2,directa,3.25,False,True,True,,"De acuerdo con los documentos del corpus:
+
+1. **Puerto SSH**: El servicio SSH debe escuchar en el puerto 2222, ya que se prohíbe exponer el puerto estándar 22 [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Parte 2]].
+
+2. **Acceso de superusuario (root)**: Se debe deshabilitar el inicio de sesión directo como root mediante la configuración `PermitRootLogin no` [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Parte 2]].
+
+3. **Algoritmos de llave pública permitidos**: Solo se permite autenticación por llave pública usando algoritmos Ed25519 o RSA de 4096 bits [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Parte 2]].",El servicio SSH debe escuchar en el puerto 2222 (prohibido el 22); se deshabilita el acceso directo de root (PermitRootLogin no) y contraseñas; solo se permiten llaves Ed25519 o RSA de 4096 bits.
+R2,Q3,directa,4.44,False,True,True,,"El playbook PB-03 indica los siguientes pasos obligatorios para un ataque de fuerza bruta SSH o VPN:
+
+1. **Evaluación de umbral:** Verificar si una misma IP externa supera **20 intentos fallidos en un lapso de 5 minutos** contra servicios SSH o VPN. [Playbook_Respuesta_Incidentes.md | Pasos obligatorios (Líneas 51-55) [Parte 1]].
+
+2. **Verificación de éxito:** Comprobar en los logs si existió algún inicio de sesión exitoso posterior desde la IP atacante o desde la misma subred. [Playbook_Respuesta_Incidentes.md | Pasos obligatorios (Líneas 51-55) [Parte 1]].
+
+3. **Bloqueo:** Si no hubo compromiso, bloquear la IP atacante en el firewall perimetral durante **24 horas** y registrar el evento como severidad **P3**. [Playbook_Respuesta_Incidentes.md | Pasos obligatorios (Líneas 51-55) [Parte 2]].
+
+4. **Escalamiento por compromiso:** Si se detecta un inicio de sesión exitoso tras los intentos fallidos, escalar a **P2** (o **P1** si es cuenta privilegiada), revocar llaves SSH o certificados VPN afectados y revisar persistencia en el servidor. [Playbook_Respuesta_Incidentes.md | Pasos obligatorios (Líneas 51-55) [Parte 2]].","Verificar si una misma IP supera 20 intentos fallidos en 5 minutos; comprobar si hubo inicio de sesión exitoso posterior; si no hubo éxito, bloquear la IP en firewall perimetral por 24 horas (P3); si hubo éxito, escalar a P2/P1 y revocar llaves o certificados."
+R2,Q4,combinada,8.07,False,False,False,,"Según el contexto proporcionado:
+
+1. **No se debe apagar el equipo** porque el playbook indica preservar la memoria RAM para análisis forense, como se hizo en un caso similar donde se aisló el equipo de la red sin apagarlo [Registro_Incidentes_Resueltos.md | Líneas 27-36 [Parte 2]].
+
+2. **Tiempos máximos de respuesta**:
+   - **Clasificación inicial**: Todo incidente detectado debe recibir una prioridad (P1-P4) en los primeros **10 minutos** de triaje [Matriz_SLA_y_Escalamiento.docx | Sección '1. Clasificación de Severidades y Tiempos SLA' (Párrafo 4)].
+   - **Contención**: En el caso registrado, el equipo se aisló en **12 minutos** [Registro_Incidentes_Resueltos.md | Líneas 27-36 [Parte 2]].
+   - **Notificación al CISO**: Todo incidente de ransomware (P1) exige **notificación inmediata** al CISO [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 38-46) [Parte 3]].","Según PB-02 no se debe apagar para preservar la memoria volátil (RAM) y posibles llaves de cifrado; todo ransomware activo es P1 (Crítico), por lo que según la matriz SLA exige primera respuesta en 15 minutos, contención en 1 hora y notificación inmediata al CISO."
+R2,Q5,combinada,4.47,False,False,False,,"En el incidente INC-2026-019 contra el bastión SSH, la configuración de hardening que impidió la intrusión fue:
+1. Deshabilitación de autenticación por contraseña (`PasswordAuthentication no`) 
+2. Prohibición de inicio de sesión directo como root (`PermitRootLogin no`)
+3. Uso exclusivo de autenticación por llave pública con algoritmos Ed25519 [Registro_Incidentes_Resueltos.md | Sección 'INC-2026-019 — Ataque de fuerza bruta contra bastión SSH' (Líneas 17-26) [Parte 2]] [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Parte 2]].
+
+La guía técnica no especifica en los fragmentos provistos qué origen de red en particular debe restringir el acceso al puerto 2222, solo indica que el servicio SSH debe escuchar en ese puerto en lugar del estándar 22 [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Parte 1]]. 
+
+No encuentro evidencia suficiente en los documentos del corpus para responder completamente sobre las restricciones de origen de red para el puerto 2222.","En INC-2026-019 se confirmó PasswordAuthentication no, PermitRootLogin no y llaves Ed25519; según la guía de hardening, el puerto 2222 está restringido únicamente al origen VPN Corporativa."
+R2,Q6,combinada,4.06,False,True,True,,"Según el playbook, si un ataque de phishing compromete una cuenta con acceso a datos clasificados como ""Restringido"", el incidente debe reclasificarse automáticamente a severidad **P1** [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 25-33) [Parte 3]].
+
+Además, en estos casos, el SOC debe notificar al Oficial de Protección de Datos (DPO) en un plazo máximo de **2 horas** desde la confirmación del incidente [Matriz_SLA_y_Escalamiento.docx | Sección '2. Rutas de Escalamiento y Notificación Legal' (Párrafo 9)].","Según PB-01 paso 5, se reclasifica automáticamente a severidad P1; según la Matriz de SLA, si hay posible exposición de datos Restringido debe notificarse al DPO en un plazo máximo de 2 horas desde la confirmación."
+R2,Q7,sin_respuesta,2.47,False,,,True,No encuentro evidencia suficiente en los documentos del corpus para responder esta pregunta.,"Abstención: el corpus menciona genéricamente 'el EDR' y 'firewall perimetral', pero nunca especifica proveedores ni marcas comerciales."
+R2,Q8,sin_respuesta,4.07,False,,,True,No encuentro evidencia suficiente en los documentos del corpus para responder esta pregunta.,"Abstención: los documentos no contienen información financiera, presupuestal ni de dotación de turnos del personal."
+R2,Q9,sin_respuesta,0.91,False,,,True,No encuentro evidencia suficiente en los documentos del corpus para responder esta pregunta.,Abstención: el corpus no incluye protocolos de pérdida o robo de teléfonos móviles ni políticas para viajes internacionales.
+C0,Q1,directa,6.23,False,False,False,,"La longitud mínima recomendada para contraseñas administrativas suele ser **12 caracteres**, aunque algunos estándares (como NIST) sugieren al menos **8 caracteres** con complejidad.  
+
+Los métodos MFA permitidos comúnmente incluyen:  
+- **Aplicaciones autenticadoras (TOTP, como Google Authenticator o Microsoft Authenticator)**  
+- **Tokens físicos (U2F, YubiKey)**  
+- **SMS o correo electrónico (menos seguros, pero aún usados)**  
+
+El bloqueo de cuentas tras intentos fallidos varía, pero una configuración típica es:  
+- **5 a 10 intentos fallidos** bloquean la cuenta por **15 a 30 minutos** (o hasta desbloqueo manual).  
+
+*Nota: Estos valores dependen de políticas específicas de la organización o estándares aplicables (como CIS, NIST, ISO 27001). Si necesitas detalles exactos, consulta la documentación interna o normativa relevante.*",Longitud mínima de 16 caracteres para cuentas administrativas; MFA permitido únicamente con llaves físicas FIDO2/WebAuthn o apps TOTP (prohibido SMS/llamadas); bloqueo automático de 15 minutos tras 5 intentos fallidos.
+C0,Q2,directa,5.27,False,False,False,,"- **Puerto SSH**: Por defecto escucha en el **puerto 22**, pero se recomienda cambiarlo a otro puerto no estándar para evitar escaneos automáticos.  
+- **Usuario root**: Se recomienda deshabilitar el acceso directo como root (`PermitRootLogin no` en `/etc/ssh/sshd_config`).  
+- **Algoritmos de llave pública permitidos**:  
+  - **Ed25519** (recomendado por seguridad y rendimiento).  
+  - **RSA** (mínimo 2048 bits, preferible 4096).  
+  - **ECDSA** (con curvas seguras como NIST P-256).  
+
+Configuración en `/etc/ssh/sshd_config` con directivas como `PubkeyAcceptedAlgorithms`.  
+⚠️ **Algoritmos obsoletos como DSA deben deshabilitarse**.",El servicio SSH debe escuchar en el puerto 2222 (prohibido el 22); se deshabilita el acceso directo de root (PermitRootLogin no) y contraseñas; solo se permiten llaves Ed25519 o RSA de 4096 bits.
+C0,Q3,directa,5.98,False,False,False,,"El playbook PB-03 no es un documento estándar conocido públicamente, por lo que no puedo proporcionar detalles específicos sobre sus pasos obligatorios, umbrales de intentos o duración del bloqueo. Te recomiendo consultar directamente el playbook o la política de seguridad de tu organización para obtener esa información.","Verificar si una misma IP supera 20 intentos fallidos en 5 minutos; comprobar si hubo inicio de sesión exitoso posterior; si no hubo éxito, bloquear la IP en firewall perimetral por 24 horas (P3); si hubo éxito, escalar a P2/P1 y revocar llaves o certificados."
+C0,Q4,combinada,6.83,False,False,False,,"No se debe apagar el equipo porque podría perder evidencia crítica o cifrar archivos adicionales al reiniciar. Según mejores prácticas, los tiempos máximos aproximados son: **primera respuesta** (minutos), **contención** (horas) y **notificación al CISO** (dentro de las primeras 24 horas). Los tiempos exactos dependen del playbook específico de la organización.","Según PB-02 no se debe apagar para preservar la memoria volátil (RAM) y posibles llaves de cifrado; todo ransomware activo es P1 (Crítico), por lo que según la matriz SLA exige primera respuesta en 15 minutos, contención en 1 hora y notificación inmediata al CISO."
+C0,Q5,combinada,6.35,False,False,False,,"No tengo acceso a detalles específicos del incidente INC-2026-019 ni a configuraciones internas del bastión SSH mencionado.  
+
+En general, las medidas de *hardening* que suelen impedir intrusiones en servidores SSH incluyen:  
+- **Restricción por origen IP** (ACLs/firewalls).  
+- **Autenticación por clave pública** (deshabilitar autenticación por contraseña).  
+- **Uso de puertos no estándar** (ej. 2222 en lugar de 22).  
+- **Fail2ban** o mecanismos de bloqueo ante intentos fallidos.  
+
+Para el puerto **2222**, las guías técnicas típicas recomiendan restringir el acceso únicamente a **IPs de administradores o redes internas de confianza**.  
+
+Si necesitas detalles exactos del incidente o la configuración aplicada, consulta la documentación interna de tu organización o el equipo responsable.","En INC-2026-019 se confirmó PasswordAuthentication no, PermitRootLogin no y llaves Ed25519; según la guía de hardening, el puerto 2222 está restringido únicamente al origen VPN Corporativa."
+C0,Q6,combinada,5.83,False,False,False,,"Según estándares generales de ciberseguridad y protección de datos:  
+
+- **Severidad**: Se reclasificaría como **incidente de severidad alta o crítica**, dado que compromete datos clasificados como ""Restringido"" (equivalente a información sensible o confidencial).  
+- **Plazo de notificación al DPO**: En la mayoría de regulaciones (como el GDPR), el plazo máximo suele ser **72 horas** desde que se confirma el incidente, pero puede variar según la normativa local o políticas internas de la organización.  
+
+*Nota*: Para una respuesta exacta, se debe consultar el playbook específico de la organización y la normativa aplicable (ej. GDPR, LOPDGDD, etc.), ya que los plazos y clasificaciones pueden ajustarse a criterios internos.","Según PB-01 paso 5, se reclasifica automáticamente a severidad P1; según la Matriz de SLA, si hay posible exposición de datos Restringido debe notificarse al DPO en un plazo máximo de 2 horas desde la confirmación."
+C0,Q7,sin_respuesta,1.87,False,,,True,"No tengo acceso a información específica sobre los proveedores de EDR o firewalls contratados por NovaCloud Corp, ya que se trata de datos internos de la empresa.","Abstención: el corpus menciona genéricamente 'el EDR' y 'firewall perimetral', pero nunca especifica proveedores ni marcas comerciales."
+C0,Q8,sin_respuesta,1.31,False,,,True,No tengo acceso a información interna como presupuestos o estructuras de personal de NovaCloud Corp. Te recomiendo contactar directamente con la empresa para obtener esos datos específicos.,"Abstención: los documentos no contienen información financiera, presupuestal ni de dotación de turnos del personal."
+C0,Q9,sin_respuesta,4.5,False,,,False,"El empleado debe seguir estos pasos de forma inmediata:  
+
+1. **Reportar la pérdida** al departamento de TI o seguridad de la empresa.  
+2. **Bloquear el dispositivo** de forma remota (si está configurado) mediante herramientas como MDM (Mobile Device Management).  
+3. **Cambiar contraseñas** de cuentas corporativas vinculadas al dispositivo.  
+4. **Solicitar asistencia** para borrado remoto de datos sensibles si es necesario.  
+
+Si la empresa tiene políticas específicas para viajes internacionales (como notificar a autoridades locales o requisitos adicionales), el empleado debe seguirlas según lo indicado.",Abstención: el corpus no incluye protocolos de pérdida o robo de teléfonos móviles ni políticas para viajes internacionales.
+R0_ALT,Q1,directa,4.42,False,False,False,,"La longitud mínima de contraseña para cuentas administrativas es de 16 caracteres [Politica_Seguridad_y_Accesos.pdf | Página 2 [Parte 1]]. Los métodos MFA aprobados son únicamente los mencionados en la política, aunque no se especifican en detalle en el fragmento proporcionado, se indica que no incluyen SMS [Registro_Incidentes_Resueltos.md | Sección 'INC-2026-014 — Campaña de Phishing dirigida al área de Finanzas' (Líneas 7-16) [Parte 2]]. La cuenta se bloqueará automáticamente durante 15 minutos tras los intentos fallidos [Politica_Seguridad_y_Accesos.pdf | Página 2 [Parte 3]].",Longitud mínima de 16 caracteres para cuentas administrativas; MFA permitido únicamente con llaves físicas FIDO2/WebAuthn o apps TOTP (prohibido SMS/llamadas); bloqueo automático de 15 minutos tras 5 intentos fallidos.
+R0_ALT,Q2,directa,3.42,False,True,True,,El servicio SSH debe escuchar en el puerto 2222 [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Parte 2]]. El inicio de sesión directo como root debe deshabilitarse mediante la configuración `PermitRootLogin no` [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Parte 2]]. Solo se permite la autenticación por llave pública usando algoritmos Ed25519 o RSA de 4096 bits [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Parte 2]].,El servicio SSH debe escuchar en el puerto 2222 (prohibido el 22); se deshabilita el acceso directo de root (PermitRootLogin no) y contraseñas; solo se permiten llaves Ed25519 o RSA de 4096 bits.
+R0_ALT,Q3,directa,6.35,False,True,True,,"Los pasos obligatorios indicados en el playbook PB-03 para un ataque de fuerza bruta SSH o VPN son los siguientes:
+
+1. **Evaluación de umbral:** Verificar si una misma IP externa supera **20 intentos fallidos en un lapso de 5 minutos** contra servicios SSH o VPN [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 51-55) [Parte 1]].
+
+2. **Verificación de éxito:** Comprobar en los logs si existió algún inicio de sesión exitoso posterior desde la IP atacante o desde la misma subred [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 51-55) [Parte 1]].
+
+3. **Bloqueo:** Si no hubo compromiso, bloquear la IP atacante en el firewall perimetral durante **24 horas** y registrar el evento como severidad **P3** [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 51-55) [Parte 2]].","Verificar si una misma IP supera 20 intentos fallidos en 5 minutos; comprobar si hubo inicio de sesión exitoso posterior; si no hubo éxito, bloquear la IP en firewall perimetral por 24 horas (P3); si hubo éxito, escalar a P2/P1 y revocar llaves o certificados."
+R0_ALT,Q4,combinada,5.44,False,False,False,,"Si un analista recibe una alerta de sospecha de ransomware, no debe apagar el equipo porque es necesario preservar la evidencia, lo que incluye capturar un volcado de memoria RAM e imagen forense del disco antes de iniciar la limpieza [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 38-46) [Parte 2]].
+
+El incidente debe ser atendido de la siguiente manera:
+- **Primera respuesta y contención:** No se especifican tiempos máximos exactos en el contexto proporcionado.
+- **Notificación al CISO:** El incidente debe ser notificado inmediatamente al CISO, ya que todo incidente de ransomware activo se clasifica como P1 (Crítico) [Playbook_Respuesta_Incidentes.md | Sección 'Pasos obligatorios' (Líneas 38-46) [Parte 3]].","Según PB-02 no se debe apagar para preservar la memoria volátil (RAM) y posibles llaves de cifrado; todo ransomware activo es P1 (Crítico), por lo que según la matriz SLA exige primera respuesta en 15 minutos, contención en 1 hora y notificación inmediata al CISO."
+R0_ALT,Q5,combinada,5.33,False,False,False,,"En el incidente INC-2026-019 contra el bastión SSH, la configuración de hardening que impidió la intrusión fue la prohibición de exponer el puerto estándar 22, y se utilizó un puerto alternativo (2222) para el servicio SSH [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Parte 1]]. 
+
+Sin embargo, la guía técnica no especifica explícitamente a qué origen de red restringe el acceso al puerto 2222. La guía solo menciona que se debe prohibir exponer el puerto estándar 22 y que el servicio SSH debe configurarse de manera segura, pero no proporciona detalles sobre restricciones de origen de red específicas para el puerto 2222 [Guia_Hardening_Red_y_Servidores.pdf | Página 1 [Parte 1]].","En INC-2026-019 se confirmó PasswordAuthentication no, PermitRootLogin no y llaves Ed25519; según la guía de hardening, el puerto 2222 está restringido únicamente al origen VPN Corporativa."
+R0_ALT,Q6,combinada,3.17,False,False,False,,"Si un ataque de phishing compromete una cuenta con acceso a datos clasificados como Restringido, se reclasifica como P1 (Crítico) [Matriz_SLA_y_Escalamiento.docx | Tabla 1 [Parte 1]]. En este caso, la notificación al DPO debe realizarse en un plazo máximo de 15 minutos [Matriz_SLA_y_Escalamiento.docx | Tabla 1 [Parte 1]].","Según PB-01 paso 5, se reclasifica automáticamente a severidad P1; según la Matriz de SLA, si hay posible exposición de datos Restringido debe notificarse al DPO en un plazo máximo de 2 horas desde la confirmación."
+R0_ALT,Q7,sin_respuesta,0.68,False,,,True,No encuentro evidencia suficiente en los documentos del corpus para responder esta pregunta.,"Abstención: el corpus menciona genéricamente 'el EDR' y 'firewall perimetral', pero nunca especifica proveedores ni marcas comerciales."
+R0_ALT,Q8,sin_respuesta,0.68,False,,,True,No encuentro evidencia suficiente en los documentos del corpus para responder esta pregunta.,"Abstención: los documentos no contienen información financiera, presupuestal ni de dotación de turnos del personal."
+R0_ALT,Q9,sin_respuesta,0.69,False,,,True,No encuentro evidencia suficiente en los documentos del corpus para responder esta pregunta.,Abstención: el corpus no incluye protocolos de pérdida o robo de teléfonos móviles ni políticas para viajes internacionales.
